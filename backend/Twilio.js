@@ -34,7 +34,7 @@ class Twilio{
             code,
         });
         console.log('verifyCode',data);
-        return ;
+        return data;
     }
 }
 const instance = new Twilio()
