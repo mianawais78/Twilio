@@ -4,6 +4,7 @@ import axios from './utils/Axios';
 import socket from './utils/Socket';
 import { useEffect, useState } from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
+import CallCenter from "./components/CallCenter";
 function App() {
   const [user, setUser] = useImmer({
     username: "",
@@ -43,12 +44,16 @@ function App() {
   };
   return (
     <div className="App">
-      <Login
-        user={user}
-        setUser={setUser}
-        sendSmsCode={sendSmsCode}
-        sendVerificationCode={sendVerificationCode}
-      />
+      {storedToken ? (
+        <CallCenter username={user.username} />
+      ) : (
+        <Login
+          user={user}
+          setUser={setUser}
+          sendSmsCode={sendSmsCode}
+          sendVerificationCode={sendVerificationCode}
+        />
+      )}
     </div>
   );
 }
