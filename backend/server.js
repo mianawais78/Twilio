@@ -22,6 +22,7 @@ io.on("connection", (socket) => {
 });
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 app.get("/test", (req, res) => {
@@ -41,7 +42,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/verify", async (req, res) => {
-  console.log("🚀 ~ file: server.js:44 ~ app.post ~ req:", req)
+  console.log("🚀 ~ file: server.js:44 ~ app.post ~ req:", req);
   console.log("Verifying Code.");
   const { to, code, username } = req.body;
   const data = await twilio.verifyCodeAsync(to, code);
@@ -50,4 +51,25 @@ app.post("/verify", async (req, res) => {
     return res.send({ token });
   }
   res.status("401").send("Invalid Token");
+});
+
+app.post("/call-new", (req, res) => {
+  console.log("Received new Call.");
+
+  const response = twilio.voiceResponse(
+    "Thank you for calling Call Center. We will put you on a hold util the next attendent is free."
+  );
+  io.emit("call-new", { data: req.body });
+  res.type("text/xml");
+  res.send(response.toString());
+});
+app.post("/enqueue", (req, res) => {
+  const response = twilio.enqueueCall("Customer Service.");
+  io.emit("enqueue", { data: req.body });
+  res.type("text/xml");
+  res.send(response.toString());
+});
+app.post("/call-status-changed", (req, res) => {
+  console.log("Call Status Changed.", res.body);
+  res.send("ok");
 });

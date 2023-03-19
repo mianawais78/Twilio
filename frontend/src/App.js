@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import CallCenter from "./components/CallCenter";
 function App() {
+  const [calls, setCalls] = useImmer({
+    calls: [],
+  });
   const [user, setUser] = useImmer({
     username: "",
     mobileNumber: "",
@@ -18,6 +21,21 @@ function App() {
   useEffect(() => {
     socket.on("disconnect", () => {
       console.log("Socket disconnected.");
+    });
+    socket.on("call-new", (data) => {
+      console.log("🚀 ~ file: App.js:26 ~ socket.on ~ data:", data);
+
+      setCalls((draft) => {
+        draft.calls.push(data);
+      });
+    });
+    socket.on("enqueue", (data) => {
+      setCalls((draft) => {
+        const index = draft.calls.findIndex(
+          ({ callSid }) => callSid === data.callSid
+        );
+        draft.calls[index].data.CallStatus = "enqueue";
+      });
     });
     return () => {};
   }, []);
@@ -45,7 +63,7 @@ function App() {
   return (
     <div className="App">
       {storedToken ? (
-        <CallCenter username={user.username} />
+        <CallCenter username={user.username} calls={calls} />
       ) : (
         <Login
           user={user}
