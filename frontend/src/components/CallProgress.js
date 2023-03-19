@@ -1,26 +1,31 @@
 import { Container, Step } from "semantic-ui-react";
 
-const CallProgress = () => {
+const CallProgress = (props) => {
   return (
     <Container>
       <Step.Group fluid>
         <Step
           icon="phone"
           title="Ringing"
-          description="+1 555-5555"
-          completed
+          description={props.call.data.From}
+          active={props.call.data.CallStatus === "ringing"}
+          completed={props.call.data.CallStatus !== "ringing"}
         />
         <Step
           icon="cogs"
           title="In queue"
           description="User waiting in queue"
-          active
+          active={props.call.data.CallStatus !== "enqueue"}
+          disabled={props.call.data.CallStatus === "ringing"}
         />
         <Step
           icon="headphones"
           title="Answered"
           description="Answer by John"
-          disabled
+          disabled={
+            props.call.data.CallStatus === "ringing" ||
+            props.call.data.CallStatus === "enqueue"
+          }
         />
         <Step icon="times" title="Hang up" description="Missed Call" />
       </Step.Group>
